@@ -5,10 +5,10 @@ const logger = require("koa-logger");
 const session = require("koa-session");
 const Redis = require("ioredis");
 const port = 3000;
-
+const auth = require("./koa/auth")
 const RedisSessionStore = require("./koa/session-store");
 // 创建redis client
-const redis = new Redis();
+const redis = new Redis()
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
@@ -23,12 +23,13 @@ app.prepare().then(() => {
   server.keys = ["lijianhui"];
   const SESSION_CONFIG = {
     key: "jid",
-    store: new RedisSessionStore()
+    store: new RedisSessionStore(redis)
   };
   server.use(session(SESSION_CONFIG, server));
-
+  // 处理github登录 
+  auth(server)
   server.use(async (ctx, next) => {
-    console.log("session is", ctx.session);
+    // console.log("session is", ctx.session);
     await next();
   });
 

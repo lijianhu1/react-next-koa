@@ -4,20 +4,22 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import reducers from "./reducers";
 
 import { initCount } from "./reducers/count";
-
+import {userInitialState} from "./reducers/user"
 export default function initialzeStore(state) {
   const store = createStore(
     reducers,
     Object.assign(
       {},
       {
-        count: initCount
+        count: initCount,
+        user:userInitialState
       },
       state
     ),
     composeWithDevTools(applyMiddleware(ReduxThunk))
+
   ); // 创建数据存储仓库
-  store.dispatch({ type: "ADD", num: 3 });
+  // store.dispatch({ type: "ADD", num: 3 });
   function asyncAdd(num) {
     console.log("___________________");
 
@@ -27,6 +29,6 @@ export default function initialzeStore(state) {
       }, 1000);
     };
   }
-  store.dispatch(asyncAdd(5));
+  // store.dispatch(asyncAdd(5));
   return store;
 }

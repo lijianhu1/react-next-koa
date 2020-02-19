@@ -1,6 +1,8 @@
 import { combineReducers } from "redux";
 import count from "./count";
+import user from "./user"
 const appReducer = combineReducers({
-  count
+  count,
+  user
 });
 export default appReducer;

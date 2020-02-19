@@ -1,7 +1,21 @@
 import Link from "next/link";
 import { connect } from "react-redux";
 import { add } from "../store/actions";
-function Index({ count, addNum }) {
+import getConfig from "next/config";
+const {publicRuntimeConfig}  = getConfig();
+import axios from "axios";
+import {useEffect} from "react";
+
+const api = require('../lib/api')
+function Index({ count, addNum,user }) {
+  useEffect(()=>{
+      // api.getUserInfo(res=>{
+      //     console.log(res)
+      // })
+    // axios.get("/api/user/info").then(resp=>{
+    //     console.log(resp)
+    // })
+  },[]);
   return (
     <div style={{ background: "#fff", padding: 24, minHeight: 380 }}>
       <Link href={`/search`}>
@@ -19,16 +33,25 @@ function Index({ count, addNum }) {
       >
         add
       </button>
+      <a href={publicRuntimeConfig.OAUTH_URL}>去登陆</a>
+        <div>
+            用户{JSON.stringify(user)}
+        </div>
     </div>
   );
 }
 Index.getInitialProps = async ({ reduxStore }) => {
-  reduxStore.dispatch(add(3));
-  return {};
-};
-function mapStateToprops(state) {
+    api.getUserInfo(res=>{
+        console.log(res)
+    })
   return {
-    count: state.count
+        // result
+  };
+};
+function mapStateToProps(state) {
+  return {
+    count: state.count,
+      user:state.user
   };
 }
 function mapDispatchToProps(dispatch) {
@@ -36,4 +59,4 @@ function mapDispatchToProps(dispatch) {
     addNum: num => dispatch(add(num))
   };
 }
-export default connect(mapStateToprops, mapDispatchToProps)(Index);
+export default connect(mapStateToProps, mapDispatchToProps)(Index);

@@ -1,15 +1,24 @@
 import { useState, useCallback } from "react";
-import { Layout, Icon, Input, Avatar } from "antd";
+import {withRouter} from "next/router"
+import { Layout, Icon, Input, Avatar,Tooltip,Menu, Dropdown } from "antd";
 const { Header, Content, Footer } = Layout;
 import Container from "./Container";
-
+import { logout } from "../store/actions";
 import Link from "next/link";
-
-function LayoutComp({ children }) {
-  const [searchVal, setSearchVal] = useState("sear");
-
+import getConfig from "next/config";
+const {publicRuntimeConfig}  = getConfig();
+import { connect } from "react-redux";
+const api = require('../lib/api')
+function LayoutComp({ children,user,logoutUser,router }) {
+  const [searchVal, setSearchVal] = useState(router.query&&router.query.q||"");
+    const handleLogout = useCallback(()=>{
+        logoutUser()
+    },[logoutUser]);
+    const userDropDown = (<Menu><Menu.Item> <span onClick={handleLogout}>登 出</span> </Menu.Item></Menu>);
+    const handleOnSearch = useCallback((val)=>{
+        router.push(`/search?q=${val}`)
+    },[searchVal]);
   return (
-    <div>
       <Layout>
         <Header style={{ position: "fixed", zIndex: 1, width: "100%" }}>
           <Container
@@ -37,13 +46,17 @@ function LayoutComp({ children }) {
               <Input.Search
                 placeholder="搜索"
                 defaultValue={searchVal}
-                onSearch={val => {
-                  setSearchVal(val);
-                }}
+                onSearch={handleOnSearch}
               />
             </div>
             <div className="header-right">
-              <Avatar icon="user" size={40} />
+                {
+                    user&&user.id?
+                        (<Dropdown overlay={userDropDown}>
+                            <a href="/"><Avatar src={user.avatar_url} size={40} /></a></Dropdown>)
+                        :
+                        (<Tooltip placement="bottom" title="点击登陆"><a href={`/prepare-auth?url=${router.asPath}`}>  <Avatar icon="user" size={40} /> </a></Tooltip>)
+                }
             </div>
             <style jsx>
               {`
@@ -58,6 +71,14 @@ function LayoutComp({ children }) {
                 }
               `}
             </style>
+            <style jsx global>{`
+              #__next{
+                height:100%;
+              }
+              .ant-layout{
+                height:100%
+              }
+            `}</style>
           </Container>
         </Header>
         <Content style={{ marginTop: 64 }}>{children}</Content>
@@ -65,8 +86,19 @@ function LayoutComp({ children }) {
           Ant Design ©2018 Created by Ant UED
         </Footer>
       </Layout>
-    </div>
   );
 }
+function mapStateToprops(state) {
+    return {
+        user:state.user
+    }
+}
 
-export default LayoutComp;
+function mapDispatchToProps(dispatch) {
+    return {
+        logoutUser:()=>{
+            dispatch(logout())
+        }
+    }
+}
+export default connect(mapStateToprops,mapDispatchToProps)(withRouter(LayoutComp));

@@ -3,12 +3,14 @@ function getRedisSessionId(sid) {
 }
 
 class RedisSessionStore {
+  constructor(client) {
+    this.client = client
+  }
   // 获取redis中存储的session数据
   async get(sid) {
-    console.log("get id", sid);
-    console.log();
 
     const id = getRedisSessionId(sid);
+    
     const data = await this.client.get(id);
     if (!data) {
       return null;
@@ -20,7 +22,6 @@ class RedisSessionStore {
   }
   // 存储的session数据到redis
   async set(sid, sess, ttl) {
-    console.log("set id", sid);
 
     const id = getRedisSessionId(sid);
     if (typeof ttl === "number") {

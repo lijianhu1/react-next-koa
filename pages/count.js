@@ -72,7 +72,7 @@ function Count({ countFromStore }) {
           value={name}
         />
       </div>
-      <p>{context}</p>
+      <p>123{context}</p>
       <Child config={config} onButtonClick={handleMyClick} />
 
       <div>countFromStore:{countFromStore}</div>

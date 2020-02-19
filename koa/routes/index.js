@@ -14,5 +14,23 @@ router.get("/set/user", async (ctx, next) => {
   };
   ctx.body = "set session";
 });
+router.get("/delete/user", async (ctx, next) => {
+  ctx.session=null;
+  ctx.body = "delete session";
+});
+router.get("/api/user/info", async (ctx, next) => {
+const user = ctx.session.userInfo;
+if (!user) {
+  ctx.status = 401
+  ctx.body = "Need login"
+}else{
+  ctx.body = {
+    code:200,
+    data:user
+  }
+  ctx.set('Content-Type', 'application/json')
+}
+  
+});
 
 module.exports = router;
